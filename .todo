@@ -1,0 +1,86 @@
+<todo version="0.1.19">
+    <title>
+        HTML::GenToc
+    </title>
+    <note priority="high" time="1095763691" done="1096112207">
+        fix oddness with OL tags
+        <comment>
+            killed two birds with one stone
+        </comment>
+        <note priority="high" time="1096086382" done="1096088754">
+            add test for --ol option
+        </note>
+        <note priority="high" time="1096086413" done="1096109291">
+            add test for H1 -&gt; H3 -&gt; H2 sequence
+        </note>
+        <note priority="high" time="1096086457" done="1096112192">
+            rewrite: make TOC lists nest properly, reduce need of "invisible" LI tags to absolute necessity
+            <comment>
+                used stuff from txt2html
+            </comment>
+        </note>
+    </note>
+    <note priority="high" time="1140499101" done="1180240048">
+        completely rewrite to build lists of lists, and use HTML::LinkList
+    </note>
+    <note priority="high" time="1179391941" done="1180240057">
+        Make this work better with strings, make it able to be used as a plugin for other things.
+    </note>
+    <note priority="high" time="1179391967" done="1180240064">
+        Try to make it work as a one-pass solution.
+        <comment>
+            massive rewrite, this is going to be version 3.00
+        </comment>
+    </note>
+    <note priority="medium" time="1095763681" done="1096085287">
+        add test for --tocmap option
+        <comment>
+            fixed bug with tocmap too
+        </comment>
+    </note>
+    <note priority="medium" time="1095763738" done="1096345882">
+        give more examples of using hypertoc in two passes with custom --toc_entry stuff
+        <comment>
+            also put in stuff about depricated features
+        </comment>
+    </note>
+    <note priority="medium" time="1095764016" done="1095888235">
+        change over to Module::Build
+    </note>
+    <note priority="medium" time="1095764199" done="1098424335">
+        add an option to use IDs instead of anchors
+    </note>
+    <note priority="medium" time="1095802721" done="1096714151">
+        enable OL on all levels
+    </note>
+    <note priority="medium" time="1095888586" done="1098427400">
+        automate release process
+        <comment>
+            finally!
+        </comment>
+        <note priority="medium" time="1095888641" done="1096004153">
+            generate TODO file
+        </note>
+        <note priority="medium" time="1095888651" done="0">
+            generate README file from POD
+        </note>
+        <note priority="medium" time="1095888688" done="1096004170">
+            automate tag for darcs
+        </note>
+        <note priority="medium" time="1095888722" done="1096004181">
+            generate Changes file updates from darcs change list
+        </note>
+    </note>
+    <note priority="medium" time="1096086537" done="1096542041">
+        change hypertoc to work properly when using anchor + toc in same call
+        <comment>
+            also fixed odd behaviour with defaulting to STDOUT
+        </comment>
+    </note>
+    <note priority="medium" time="1095886903">
+        make toc_end optional, defaulting to / + toc_entry key
+    </note>
+    <note priority="medium" time="1180240291">
+        figure out some way of *replacing* an inline ToC
+    </note>
+</todo>
