@@ -15,16 +15,15 @@ $html1 ="<h1>Cool header</h1>
 <p>Another paragraph.</p>
 ";
 
-$html2 ="<h1><a name=\"Cool\">Cool header</a></h1>
+$html2 ="<h1><a name=\"Cool_header\">Cool header</a></h1>
 <p>This is a paragraph.</p>
-<h2><a name=\"Getting\">Getting Cooler</a></h2>
+<h2><a name=\"Getting_Cooler\">Getting Cooler</a></h2>
 <p>Another paragraph.</p>
 ";
 
 $out_str = $toc->generate_toc(
     make_anchors=>1,
     make_toc=>0,
-    outfile=>'',
     to_string=>1,
     filenames=>["fred.html"],
     input=>$html1,
@@ -43,7 +42,6 @@ is($out_str, $html2, "(1) generate_anchors matches strings");
 $out_str = $toc->generate_toc(
     make_anchors=>0,
     make_toc=>1,
-    outfile=>'',
     to_string=>1,
     filenames=>["fred.html"],
     input=>$html2,
@@ -56,8 +54,8 @@ $ok_toc_str1='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN">
 </head>
 <body>
 <h1>Table of Contents</h1>
-<ul><li><a href="fred.html#Cool">Cool header</a>
-<ul><li><a href="fred.html#Getting">Getting Cooler</a></li>
+<ul><li><a href="fred.html#Cool_header">Cool header</a>
+<ul><li><a href="fred.html#Getting_Cooler">Getting Cooler</a></li>
 </ul></li>
 </ul>
 </body>
@@ -69,7 +67,6 @@ is($out_str, $ok_toc_str1, "(2) generate_toc matches toc string");
 $out_str = $toc->generate_toc(
     make_anchors=>0,
     make_toc=>1,
-    outfile=>'',
     to_string=>1,
     filenames=>["fred.html"],
     input=>$html2,
@@ -79,14 +76,14 @@ $out_str = $toc->generate_toc(
     toclabel=>'',
 );
 
-$ok_toc_str2='<h1><a name="Cool">Cool header</a></h1>
-<ul><li><a href="#Cool">Cool header</a>
-<ul><li><a href="#Getting">Getting Cooler</a></li>
+$ok_toc_str2='<h1><a name="Cool_header">Cool header</a></h1>
+<ul><li><a href="#Cool_header">Cool header</a>
+<ul><li><a href="#Getting_Cooler">Getting Cooler</a></li>
 </ul></li>
 </ul>
 
 <p>This is a paragraph.</p>
-<h2><a name="Getting">Getting Cooler</a></h2>
+<h2><a name="Getting_Cooler">Getting Cooler</a></h2>
 <p>Another paragraph.</p>
 ';
 
@@ -104,16 +101,15 @@ $html1 ="<h1>Cool header</h1>
 <p>Another paragraph.</p>
 ";
 
-$html2 ="<h1 id='Cool'>Cool header</h1>
+$html2 ="<h1 id='Cool_header'>Cool header</h1>
 <p>This is a paragraph.</p>
-<h2 id='Getting'>Getting Cooler</h2>
+<h2 id='Getting_Cooler'>Getting Cooler</h2>
 <p>Another paragraph.</p>
 ";
 
 $out_str = $toc->generate_toc(
     make_anchors=>1,
     make_toc=>0,
-    outfile=>'',
     to_string=>1,
     use_id=>1,
     filenames=>["fred.html"],
@@ -133,7 +129,6 @@ is($out_str, $html2, "(4) generate_anchors (id) matches strings");
 $out_str = $toc->generate_toc(
     make_anchors=>0,
     make_toc=>1,
-    outfile=>'',
     to_string=>1,
     filenames=>["fred.html"],
     input=>$html2,
@@ -146,8 +141,8 @@ $ok_toc_str1='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN">
 </head>
 <body>
 <h1>Table of Contents</h1>
-<ul><li><a href="fred.html#Cool">Cool header</a>
-<ul><li><a href="fred.html#Getting">Getting Cooler</a></li>
+<ul><li><a href="fred.html#Cool_header">Cool header</a>
+<ul><li><a href="fred.html#Getting_Cooler">Getting Cooler</a></li>
 </ul></li>
 </ul>
 </body>

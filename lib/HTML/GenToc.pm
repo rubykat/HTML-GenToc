@@ -1,5 +1,4 @@
 package HTML::GenToc;
-require 5.8.1;
 use strict;
 
 =head1 NAME
@@ -102,6 +101,7 @@ Arguments are given as a hash of arguments.
 
 use Data::Dumper;
 use HTML::SimpleParse;
+use HTML::Entities;
 use HTML::LinkList;
 
 #################################################################
@@ -453,10 +453,9 @@ be output.
 
 to_string => 1
 
-Return the modified HTML output as a string.  This does I<not> override
-other methods of output, except in the case where the user hasn't
-specified any other method of output; then the default method (STDOUT)
-is overridden to just output to the string.
+Return the modified HTML output as a string.  This I<does> override
+other methods of output (unlike version 3.00).  If this is false,
+the method will return 1.
 
 =item use_id
 
@@ -497,6 +496,10 @@ sub generate_toc ($%) {
 	@_
     );
 
+    if ($args{debug})
+    {
+    	print STDERR Dumper(\%args);
+    }
     if (!$args{input}) 
     {
 	warn "generate_toc: no input given\n";
@@ -668,53 +671,56 @@ the given content.
 sub make_anchor_name ($%) {
     my $self = shift;
     my %args = (
-	content=>'',
+	content=>'', # will be overwritten by one of @_
 	anchors=>undef,
 	@_
     );
-    my $content = $args{content};
+    my $name = $args{content};  # the anchor name will most often be very close to the token content
 
-    my $name = "";
-
-    if ($content !~ /^\s*$/) {
-	# try to generate a unique anchor
-
-	$content =~ s/\&[a-z]*;//g;   # remove entities
-	# remove leading "The " and "A "
-	$content =~ s/^The //;
-	$content =~ s/^A //;
-	$content =~ s/^An //;
-	# remove nonalphanumerics, non-spaces
-	$content =~ s/[^ a-zA-Z0-9]*//g;
-	$content =~ s/^\s*//;  # remove leading spaces
-	$content =~ s/\s*$//;  # remove trailing spaces
-
-	# try the first word of the content
-	my @cont_arr = split(/\s/, $content);
-	$name = shift @cont_arr;
-	$name =~ s/^(\d+)/id$1/;  # prefix leading numbers
-	# try the second word of the content
-	if ((!$name
-	    || (defined $args{anchors}->{$name}
-		&& $args{anchors}->{$name}))
-	    && @cont_arr)
-	{
-	    $name .= shift @cont_arr;
-	    $name =~ s/^\d*//;
-	}
+    if ($name !~ /^\s*$/) {
+        # generate a SEO-friendly anchor right from the token content
+	# The allowed character set is limited first by the URI specification
+	# for fragments, http://tools.ietf.org/html/rfc3986#section-2:
+	# characters then by the limitations of the values of 'id' and 'name'
+	# attributes: http://www.w3.org/TR/REC-html40/types.html#type-name
+        # Eventually, the only punctuation allowed in id values is [_.:-]
+	# Unicode characters with code points > 0x7E (e.g. Chinese characters)
+	# are allowed (test "<h1 id="行政区域">header</h1>" at
+	# http://validator.w3.org/#validate_by_input+with_options), except for
+	# smart quotes (!), see
+	# http://www.w3.org/Search/Mail/Public/search?type-index=www-validator&index-type=t&keywords=[VE][122]+smart+quotes&search=Search+Mail+Archives
+	# However, that contradicts the HTML 4.01 spec: "Anchor names should be
+	# restricted to ASCII characters." -
+	# http://www.w3.org/TR/REC-html40/struct/links.html#h-12.2.1
+	# ...and the [A-Za-z] class of letters mentioned at
+	# http://www.w3.org/TR/REC-html40/types.html#type-name Finally, note
+	# that pod2html fails miserably to generate XHTML-compliant anchor
+	# links. See
+	# http://validator.w3.org/check?uri=http%3A%2F%2Fsearch.cpan.org%2Fdist%2FCatalyst-Runtime%2Flib%2FCatalyst%2FRequest.pm&charset=(detect+automatically)&doctype=XHTML+1.0+Transitional&group=0&user-agent=W3C_Validator%2F1.606
+	$name =~ s/\s/_/g;
+	# we need to replace [#&;] only when they are NOT part of an HTML
+	# entity. decode_entities saves us from crafting a nasty regexp
+        decode_entities($name);
+	# MediaWiki also uses the period, see
+	# http://en.wikipedia.org/wiki/Hierarchies#Ethics.2C_behavioral_psychology.2C_philosophies_of_identity
+	$name =~ s/([^\w_.:-])/'.'.sprintf('%02X', ord($1))/eg;
+	# "ID and NAME tokens must begin with a letter ([A-Za-z])"
+        $name = 'L'.$name if $name =~ /\A\W/;
     }
-    if (!$name)
-    {
-	$name = 'id';
-    }
+    $name = 'id' if $name eq '';
 
     # check if it already exists; if so, add a number
     my $anch_num = 1;
     my $word_name = $name;
-    while (defined $args{anchors}->{$name}
-	   && $args{anchors}->{$name})
+    my $name_key = lc $name;
+    # Reference: http://www.w3.org/TR/REC-html40/struct/links.html#h-12.2.1
+    # Anchor names must be unique within a document. Anchor names that differ
+    # only in case may not appear in the same document.
+    while (defined $args{anchors}->{$name_key}
+	   && $args{anchors}->{$name_key})
     {
-	$name = $word_name . $anch_num;
+	$name = $word_name . "_$anch_num";
+	$name_key = lc $name;
 	$anch_num++;
     }
 
@@ -754,6 +760,8 @@ sub make_anchors ($%) {
 
     my @newhtml = ();
     my %anchors = ();
+    # Note that the keys to the anchors hash should be lower-cased
+    # since anchor names that differ only in case are not allowed.
 
     # parse the HTML
     my $hp = new HTML::SimpleParse();
@@ -821,7 +829,7 @@ sub make_anchors ($%) {
 		($name) = $sig_tok->{content} =~ m/ID\s*=\s*$q([^$q]*)$q/i;
 		if ($name)
 		{
-		    $anchors{$name} = 1;
+		    $anchors{lc $name} = $name;
 		    push @newhtml, $hp->execute($sig_tok);
 		    $adone = 1;
 		}
@@ -875,7 +883,7 @@ sub make_anchors ($%) {
 	{
 	    if (!$name_in_anchor)
 	    {
-		$anchors{$name} = 1;
+		$anchors{lc $name} = $name;
 		# add the ID
 		$sig_tok->{content} .= " id='$name'";
 		push @newhtml, $hp->execute($sig_tok);
@@ -894,7 +902,7 @@ sub make_anchors ($%) {
 	    # Text
 	    if ($tok->{type} eq 'text') {
 		if (!$adone && $tok->{content} !~ /^\s*$/) {
-		    $anchors{$name} = 1;
+		    $anchors{lc $name} = $name;
 		    # replace the text with an anchor containing the text
 		    push(@newhtml, qq|<a name="$name">$tok->{content}</a>|);
 		    $adone = 1;
@@ -907,14 +915,14 @@ sub make_anchors ($%) {
 	    {
 		# is there an existing NAME anchor?
 		if ($name_in_anchor) {
-		    $anchors{$name} = 1;
+		    $anchors{lc $name} = $name;
 		    push @newhtml, $hp->execute($tok);
 		} else {
 		    # add the current name anchor
 		    $tmp = $hp->execute($tok);
 		    $tmp =~ s/^(<A)(.*)$/$1 name="$name" $2/i;
 		    push @newhtml, $tmp;
-		    $anchors{$name} = 1;
+		    $anchors{lc $name} = $name;
 		}
 		$adone = 1;
 	    } elsif ($tok->{type} eq 'starttag'
@@ -1254,6 +1262,7 @@ sub output_toc ($%) {
     # Output to the files if we were making anchors
     #
     if ($args{make_anchors}
+	&& !$args{to_string}
 	&& $args{overwrite})
     {
 	my $ofh;
@@ -1352,7 +1361,7 @@ sub output_toc ($%) {
 	$output = join '', @toc;
 
     }
-    elsif ($args{make_anchors} && !$args{overwrite})
+    elsif ($args{make_anchors} && (!$args{overwrite} || $args{to_string}))
     {
 	# if we're just making anchors, and we aren't overwriting
 	# the original file, we need to output it
@@ -1366,7 +1375,11 @@ sub output_toc ($%) {
 	#
 	my $file_needs_closing = 0;
 	my $ofh;
-	if ($args{outfile} && $args{outfile} ne "-") {
+	if ($args{to_string})
+	{
+	    $ofh = undef;
+	}
+	elsif ($args{outfile} && $args{outfile} ne "-") {
 	    open($ofh, "> " . $args{outfile})
 		|| die "Error: unable to open ", $args{outfile}, ": $!\n";
 	    $file_needs_closing = 1;
@@ -1385,7 +1398,17 @@ sub output_toc ($%) {
 					    filename=>$args{filenames}->[0],
 					   );
 
-	    if ($args{overwrite}) {
+	    if ($args{to_string})
+	    {
+		# just send to string, don't print anything
+		if ($args{debug})
+		{
+		    print STDERR "======== to_string output_toc ========\n";
+		    print STDERR $output;
+		    print STDERR "========----------------------========\n";
+		}
+	    }
+	    elsif ($args{overwrite}) {
 		if ($args{bak}
 		    && !($args{useorg} && -e $bakfile))
 		{
@@ -1408,23 +1431,19 @@ sub output_toc ($%) {
 		    unless $args{quiet};
 		print $ofh $output;
 	    }
-	    elsif ($args{to_string} && !$args{outfile})
-	    {
-		# just send to string, don't print anything
-	    }
 	    elsif ($args{outfile})
 	    {
 		print $ofh $output;
 	    }
 	} else {
-	    if ($args{outfile} && $args{outfile} ne "-") {
+	    if ($args{to_string})
+	    {
+		# just send to string, don't print anything
+	    }
+	    elsif ($args{outfile} && $args{outfile} ne "-") {
 		print STDERR "Writing ToC to ", $args{outfile}, "\n"
 		    unless $args{quiet};
 		print $ofh $output;
-	    }
-	    elsif ($args{to_string} && !$args{outfile})
-	    {
-		# just send to string, don't print anything
 	    }
 	    else
 	    {
@@ -1438,11 +1457,6 @@ sub output_toc ($%) {
 
     if ($args{to_string})
     {
-	if ($args{make_anchors})
-	{
-	    # the output is the input of the first file
-	    $output = $args{input}->[0];
-	}
 	return $output;
     }
     else
@@ -1844,10 +1858,12 @@ Kathryn Andersen     (RUBYKAT)	http://www.katspace.org/tools/hypertoc/
 
 Based on htmltoc by Earl Hood       ehood AT medusa.acs.uci.edu
 
+Contributions by Dan Dascalescu, <http://dandascalescu.com>
+
 =head1 COPYRIGHT
 
 Copyright (C) 1994-1997  Earl Hood, ehood AT medusa.acs.uci.edu
-Copyright (C) 2002-2007 Kathryn Andersen
+Copyright (C) 2002-2008 Kathryn Andersen
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

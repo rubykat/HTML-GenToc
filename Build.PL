@@ -6,6 +6,7 @@ my $build = Module::Build->new(
     requires		=> {
     		'HTML::LinkList' => 0.1501,
     		'HTML::SimpleParse' => 0.10,
+    		'HTML::Entities' => 0,
 		'Getopt::Long' => 2.34,
 		'Getopt::ArgvFile' => 1.09,
 		'Pod::Usage' => 0,
@@ -17,6 +18,6 @@ my $build = Module::Build->new(
     script_files	=> ['scripts/hypertoc'],
     dist_author		=> 'Kathryn Andersen',
     license		=> 'gpl',
-    create_makefile_pl => 'passthrough',
+    create_makefile_pl => 'traditional',
 );
 $build->create_build_script;

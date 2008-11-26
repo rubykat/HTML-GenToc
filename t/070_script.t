@@ -15,7 +15,7 @@ if (-f 'test1_toc.html') {
 }
 
 # now test the script
-my $command = "perl -I lib scripts/hypertoc --quiet --gen_anchors --outfile test1_anch.wml tfiles/test1.wml";
+my $command = "$^X -I lib scripts/hypertoc --quiet --gen_anchors --outfile test1_anch.wml tfiles/test1.wml";
 $result = system($command);
 ok($result == 0, 'hypertoc generated anchors from test1.wml');
 
@@ -23,7 +23,7 @@ ok($result == 0, 'hypertoc generated anchors from test1.wml');
 $result = compare('test1_anch.wml', 'tfiles/good_test1_anch.wml');
 ok($result, 'hypertoc: test1_anch.wml matches tfiles/good_test1_anch.wml exactly');
 
-$command = "perl -I lib scripts/hypertoc --gen_toc --quiet --outfile test1_toc.html test1_anch.wml";
+$command = "$^X -I lib scripts/hypertoc --gen_toc --quiet --outfile test1_toc.html test1_anch.wml";
 $result = system($command);
 ok($result == 0, 'hypertoc generated toc from test1_anch.wml');
 
@@ -40,7 +40,7 @@ if ($result) {
 #
 # test with both generate options together
 #
-$command = "perl -I lib scripts/hypertoc --gen_anchors --quiet --gen_toc --outfile test1a_toc.html tfiles/test1.wml";
+$command = "$^X -I lib scripts/hypertoc --gen_anchors --quiet --gen_toc --outfile test1a_toc.html tfiles/test1.wml";
 $result = system($command);
 ok($result == 0, 'hypertoc generated toc from test1.wml');
 
@@ -56,7 +56,7 @@ if ($result) {
 #
 # test with option file
 #
-$command = "perl -I lib scripts/hypertoc --argfile tfiles/test1b.args tfiles/test1.wml";
+$command = "$^X -I lib scripts/hypertoc --argfile tfiles/test1b.args tfiles/test1.wml";
 $result = system($command);
 ok($result == 0, 'hypertoc generated toc (argfile) from test1.wml');
 

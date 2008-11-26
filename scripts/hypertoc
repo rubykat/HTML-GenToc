@@ -1,5 +1,4 @@
 #!/usr/bin/env perl
-require 5.005_03;
 use strict;
 
 =head1 NAME
@@ -781,6 +780,8 @@ Getopt::Long
 Kathryn Andersen      http://www.katspace.org/tools/hypertoc/
 
 Based on htmltoc by Earl Hood       ehood AT medusa.acs.uci.edu
+
+Contributions from Dan Dascalescu, <http://dandascalescu.com>
 
 =head1 COPYRIGHT
 
