@@ -1,6 +1,16 @@
 Revision history for HTML::GenToc
 =================================
 
+3.10 Thu 27 November 2008
+-------------------------
+
+  * (2008-11-27) Updated documentation.
+  * (2008-11-26) Makefile.PL is auto-generated, so should not be under revision-control.
+  * (2008-11-26) 1. fixed bug with outputting to string
+    2. improved anchor making (thanks to Dan Dascalescu)
+  * (2007-12-17) Make svk ignore generated files.
+  * (2007-12-16) revamped depot
+
 3.00 Sun 27 May 2007
 --------------------
 
