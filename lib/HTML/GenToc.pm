@@ -90,6 +90,7 @@ HTML::GenToc inserts anchors into the significant elements.  One can
 use HTML::GenToc as a filter, outputing the result to another file,
 or one can overwrite the original file, with the original backed
 up with a suffix (default: "org") appended to the filename.
+One can also output the result to a string.
 
 =head1 METHODS
 
@@ -114,8 +115,6 @@ use HTML::LinkList;
 
     $toc = new HTML::GenToc();
 
-    $toc = new HTML::GenToc(\@args); # deprecated!
-
     $toc = new HTML::GenToc(toc_entry=>\%my_toc_entry,
 	toc_end=>\%my_toc_end,
 	bak=>'bak',
@@ -126,7 +125,7 @@ Creates a new HTML::GenToc object.
 
 These arguments will be used as defaults in invocations of other methods.
 
-See the other methods for possible arguments.
+See L<generate_tod> for possible arguments.
 
 =cut
 sub new {
@@ -196,8 +195,8 @@ B<Options>
 bak => I<string>
 
 If the input file/files is/are being overwritten (B<overwrite> is on), copy
-the original file to "I<filename>.I<string>".  If the value is empty, there
-is no backup file written.
+the original file to "I<filename>.I<string>".  If the value is empty, B<no>
+backup file will be created.
 (default:org)
 
 =item debug
@@ -454,8 +453,8 @@ be output.
 to_string => 1
 
 Return the modified HTML output as a string.  This I<does> override
-other methods of output (unlike version 3.00).  If this is false,
-the method will return 1.
+other methods of output (unlike version 3.00).  If I<to_string> is false,
+the method will return 1 rather than a string.
 
 =item use_id
 
@@ -663,8 +662,8 @@ to be used externally.
 	anchors=>\%anchors);
 
 Makes the anchor-name for one anchor.
-Tries to make the smallest unique name derived from
-the given content.
+Bases the anchor on the content of the significant element.
+Ensures that anchors are unique.
 
 =cut
 
@@ -1746,6 +1745,12 @@ In cases such as this it may be better not to use the B<ol> option.
 
 =item *
 
+Version 3.10 (and above) generates more verbose (SEO-friendly) anchors
+than prior versions. Thus anchors generated with earlier versions will
+not match version 3.10 anchors.
+
+=item *
+
 Version 3.00 (and above) of HTML::GenToc is not compatible with
 Version 2.x of HTML::GenToc.  It is now designed to do everything
 in one pass, and has dropped certain options: the B<infile> option
@@ -1802,7 +1807,7 @@ Tell me about them.
 =head1 REQUIRES
 
 The installation of this module requires C<Module::Build>.  The module
-depends on C<HTML::SimpleParse> and C<HTML::LinkList> and uses
+depends on C<HTML::SimpleParse>, C<HTML::Entities> and C<HTML::LinkList> and uses
 C<Data::Dumper> for debugging purposes.  The hypertoc script depends on
 C<Getopt::Long>, C<Getopt::ArgvFile> and C<Pod::Usage>.  Testing of this
 distribution depends on C<Test::More>.

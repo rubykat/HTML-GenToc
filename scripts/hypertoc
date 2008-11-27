@@ -18,29 +18,14 @@ $VERSION = '3.00';
 
 hypertoc --help | --manpage | --man_help | --man
 
-hypertoc [I<common options>] --gen_anchors [I<gen_anchors options>] file ...
-
-hypertoc [I<common options>] --gen_toc [I<gen_toc options>] file ...
-
-where I<common options> are:
-
-[--bak I<string> ] [ --debug ]
-    [ --notoc_match I<string> ] [ --overwrite ] [ --quiet ]
-    { --toc_end I<tag=endtag> } { --toc_entry I<tag=level> }
-    [ --outfile I<file> ]
-
-and I<gen_anchors options> are:
-
-[ --use_id ] [ --useorg ]
-
-and I<gen_toc options> are:
-
-[ --entrysep I<string> ] [ --footer I<file> ] [ --header I<file> ]
-    [ --inline ] [ --textonly ] [ --title I<string> ]
-    { --toc_after I<tag=suffix> } { --toc_before I<tag=prefix> }
-    [ --toc_label I<string> ] [ --toc_tag I<string> ]
-    [ --toc_tag_replace ] [ --toc_only | --notoc_only ]
-    [ --toclabel I<string> ] [ --ol | --nool ] [ --ol_num_levels ]
+hypertoc [--bak I<string> ] [ --debug ] [ --entrysep I<string> ] [ --footer I<file> ]
+[ --header I<file> ] [ --inline ] [ --make_anchors ] [ --make_toc ]
+[ --notoc_match I<string> ] [ --ol | --nool ] [ --ol_num_levels ] [ --outfile I<file> ]
+[ --overwrite ] [ --quiet ] [ --textonly ] [ --title I<string> ]
+{ --toc_after I<tag=suffix> } { --toc_before I<tag=prefix> }
+{ --toc_end I<tag=endtag> } { --toc_entry I<tag=level> }
+[ --toc_label I<string> ] [ --toc_only | --notoc_only ] [ --toc_tag I<string> ]
+[ --toc_tag_replace ] [ --use_id ] [ --useorg ] file ...
 
 =head1 DESCRIPTION
 
@@ -58,10 +43,10 @@ If H1s are specified as level 1, than they appear in the first
 level list of the ToC. If H2s are specified as a level 2, than
 they appear in a second level list in the ToC.
 
-There are two phases to the ToC generation.  The first phase
-(--gen_anchors) is to put suitable anchors into the HTML documents, and the
-second phase (--gen_toc) is to generate the ToC from HTML documents which
-have anchors in them for the ToC to link to. 
+There are two aspects to the ToC generation: (1) putting suitable anchors into
+the HTML documents (--make_anchors), and (2) generating the ToC from HTML
+documents which have anchors in them for the ToC to link to (--make_toc). 
+One can choose to do one or both of these.
 
 hypertoc also supports the ability to incorporate the ToC into the HTML
 document itself via the --inline option.
@@ -76,18 +61,11 @@ One can also define options in a config file as well as on the command-line.
 
 =head1 OPTIONS
 
-=head2 A Note about Options
-
 Options can start with "--" or "-"; boolean options can be negated
 by preceding them with "no"; options with hash or array values
 can be added to by giving the option again for each value.
 
 See L<Getopt::Long> for more information.
-
-=head2 Common Options
-
-The following arguments apply to both generating anchors and generating
-table-of-contents phases.
 
 =over
 
@@ -115,99 +93,6 @@ Enable verbose debugging output.  Used for debugging this module;
 in other words, don't bother.
 (default:off)
 
-=item --help
-
-Print a short help message and exit.
-
-=item --man_help | --manpage | --man
-
-Print all documentation and exit.
-
-=item --notoc_match
-
---notoc_match I<string>
-
-If there are certain individual tags you don't wish to include in the
-table of contents, even though they match the "significant elements",
-then if this pattern matches contents inside the tag (not the body),
-then that tag will not be included, either in generating anchors nor in
-generating the ToC.  (default: class="notoc")
-
-=item --outfile
-
---outfile I<file>
-
-File to write the output to.  This is where the modified HTML output and
-the Table-of-Contents goes to.  If you give '-' as the filename, then
-output will go to STDOUT.  (default: STDOUT)
-
-=item --overwrite
-
-Overwrite the input file with the output.  If this is in effect, --outfile
-is ignored. Used in I<generate_anchors> for creating the
-anchors "in place" and in I<generate_toc> if the --inline option is in
-effect.  (default:off)
-
-=item --quiet
-
-Suppress informative messages. (default: off)
-
-=item --toc_end
-
---toc_end I<tag>=I<endtag>
-
---toc_end "H1=/H1"
-
-For defining significant elements.  The I<tag> is the HTML tag which
-marks the start of the element.  The I<endtag> the HTML tag which
-marks the end of the element.  When matching in the input file, case
-is ignored (but make sure that all your I<tag> options referring to the same
-tag are exactly the same!).  This is a cumulative hash argument.
-(default: H1=/H1  H2=/H2)
-
-=item --toc_entry
-
---toc_entry I<tag>=I<level>
-
---toc_entry "TITLE=1" --toc_entry "H1=2"
-
-For defining significant elements.  The I<tag> is the HTML tag which marks
-the start of the element.  The I<level> is what level the tag is considered
-to be.  The value of I<level> must be numeric, and non-zero. If the value
-is negative, consective entries represented by the significant_element will
-be separated by the value set by --entrysep option.
-This is a cumulative hash argument.
-(default: H1=1  H2=2)
-
-=back
-
-=head2 Generate Anchors Options
-
-These arguments apply only to generating anchors, but see above for
-common arguments.
-
-=over
-
-=item --use_id
-
-Use id="I<name>" for anchors rather than <a name="I<name>"> anchors.
-However if an anchor already exists for a Significant Element, this
-won't make an ID for that particular element.
-
-=item --useorg
-
-Use pre-existing backup files as the input source; that is, files of the
-form I<filename>.I<bak>  (see --bak).
-
-=back
-
-=head2 Generate TOC Options
-
-These arguments apply only to generating a table-of-contents, but see
-above for common arguments.
-
-=over
-
 =item --entrysep
 
 --entrysep I<string>
@@ -227,10 +112,36 @@ File containing footer text for table of contents.
 
 File containing header text for table of contents.
 
+=item --help
+
+Print a short help message and exit.
+
 =item --inline
 
 Put ToC in document at a given point.
 See L<Inlining the ToC> for more information.
+
+=item --make_anchors | --gen_anchors
+
+Create anchors for the table-of-contents to link to.
+
+=item --make_toc | --gen_toc
+
+Make a Table-of-Contents which links to anchored significant elements.
+
+=item --man_help | --manpage | --man
+
+Print all documentation and exit.
+
+=item --notoc_match
+
+--notoc_match I<string>
+
+If there are certain individual tags you don't wish to include in the
+table of contents, even though they match the "significant elements",
+then if this pattern matches contents inside the tag (not the body),
+then that tag will not be included, either in generating anchors nor in
+generating the ToC.  (default: class="notoc")
 
 =item --ol | --nool
 
@@ -247,6 +158,25 @@ for ToC entries.
 The number of levels deep the OL listing will go if --ol is true.
 If set to zero, will use an ordered list for all levels.
 (default:1)
+
+=item --outfile
+
+--outfile I<file>
+
+File to write the output to.  This is where the modified HTML output and
+the Table-of-Contents goes to.  If you give '-' as the filename, then
+output will go to STDOUT.  (default: STDOUT)
+
+=item --overwrite
+
+Overwrite the input file with the output.  If this is in effect, --outfile
+is ignored. Used in I<generate_anchors> for creating the
+anchors "in place" and in I<generate_toc> if the --inline option is in
+effect.  (default:off)
+
+=item --quiet
+
+Suppress informative messages. (default: off)
 
 =item --textonly
 
@@ -282,12 +212,51 @@ what is required to be prepended to the Table of Contents entry
 generated for that tag.  This is a cumulative hash argument.  (default:
 undefined)
 
-=item --toc_label
+=item --toc_end
+
+--toc_end I<tag>=I<endtag>
+
+--toc_end "H1=/H1"
+
+For defining significant elements.  The I<tag> is the HTML tag which
+marks the start of the element.  The I<endtag> the HTML tag which
+marks the end of the element.  When matching in the input file, case
+is ignored (but make sure that all your I<tag> options referring to the same
+tag are exactly the same!).  This is a cumulative hash argument.
+(default: H1=/H1  H2=/H2)
+
+=item --toc_entry
+
+--toc_entry I<tag>=I<level>
+
+--toc_entry "TITLE=1" --toc_entry "H1=2"
+
+For defining significant elements.  The I<tag> is the HTML tag which marks
+the start of the element.  The I<level> is what level the tag is considered
+to be.  The value of I<level> must be numeric, and non-zero. If the value
+is negative, consective entries represented by the significant_element will
+be separated by the value set by --entrysep option.
+This is a cumulative hash argument.
+(default: H1=1  H2=2)
+
+=item --toc_label | --toclabel
 
 --toc_label I<string>
 
 HTML text that labels the ToC.  Always used.
 (default: "<h1>Table of Contents</h1>")
+
+=item --toc_only | --notoc_only
+
+Output only the Table of Contents, that is, the Table of Contents plus
+the toc_label.  If there is a --header or a --footer, these will also be
+output.
+
+If --toc_only is false (i.e. --notoc_only is set) then if there is no
+--header, and --inline is not true, then a suitable HTML page header will
+be output, and if there is no --footer and --inline is not true,
+then a HTML page footer will be output.
+(default:--notoc_only)
 
 =item --toc_tag
 
@@ -308,23 +277,16 @@ This can be useful if your toc_tag is a comment and you don't need it
 after you have the ToC in place.
 (default:false)
 
-=item --toc_only | --notoc_only
+=item --use_id
 
-Output only the Table of Contents, that is, the Table of Contents plus
-the toc_label.  If there is a --header or a --footer, these will also be
-output.
+Use id="I<name>" for anchors rather than <a name="I<name>"> anchors.
+However if an anchor already exists for a Significant Element, this
+won't make an ID for that particular element.
 
-If --toc_only is false (i.e. --notoc_only is set) then if there is no
---header, and --inline is not true, then a suitable HTML page header will
-be output, and if there is no --footer and --inline is not true,
-then a HTML page footer will be output.
-(default:--notoc_only)
+=item --useorg
 
-=item --toclabel
-
---toclabel I<string>
-
-(same as --toc_label)
+Use pre-existing backup files as the input source; that is, files of the
+form I<filename>.I<bak>  (see --bak).
 
 =back
 
@@ -466,7 +428,7 @@ HTML markup will be added, unless the --toc_only option is specified.
 If you do not want/need to deal with header, and footer, files, then
 you are alloed to specify the title, --title option, of the ToC file;
 and it allows you to specify a heading, or label, to put before ToC
-entries' list, the --toclabel option. Both options have default values,
+entries' list, the --toc_label option. Both options have default values,
 see L</OPTIONS> for more information on each option.
 
 If you do not want HTML page tags to be supplied, and just want
@@ -531,7 +493,7 @@ already contain these tags/elements.
 
 =head2 Create an inline ToC for one file
 
-    hypertoc --inline --gen_anchors --overwrite --gen_toc index.html
+    hypertoc --inline --make_anchors --overwrite --make_toc index.html
 
 This will create anchors in C<index.html>, create a ToC with
 a heading of "Table of Contents" and place it after the BODY
@@ -542,15 +504,15 @@ the original index.html file, without ToC or anchors.
 
 First, create the anchors.
 
-    hypertoc --gen_anchors --overwrite index.html fred.html george.html
+    hypertoc --make_anchors --overwrite index.html fred.html george.html
 
 Then create the ToC
 
-    hypertoc --gen_toc --outfile table.html index.html fred.html george.html
+    hypertoc --make_toc --outfile table.html index.html fred.html george.html
 
 =head2 Create an inline ToC after the first heading of the first file
 
-    hypertoc --gen_anchors --inline --overwrite --gen_toc --toc_tag /H1 \
+    hypertoc --make_anchors --inline --overwrite --make_toc --toc_tag /H1 \
     --notoc_tag_replace --toc_label "" index.html fred.html george.html
 
 This will create anchors in the C<index.html>, C<fred.html> and
@@ -560,8 +522,8 @@ C<index.html.org>, C<fred.html.org> and C<george.html.org>
 
 =head2 Create an inline ToC with custom elements
 
-	hypertoc --quiet --gen_anchors --bak "" --overwrite \
-	--gen_toc --inline --toc_label "" --toc_tag '!--toc--' \
+	hypertoc --quiet --make_anchors --bak "" --overwrite \
+	--make_toc --inline --toc_label "" --toc_tag '!--toc--' \
 	--toc_tag_replace \
 	--toc_entry H2=1 --toc_entry H3=2 \
 	--toc_end H2=/H2 --toc_end H3=/H3 myfile.html
@@ -574,11 +536,11 @@ the last step.
 
 =head2 Create a ToC with custom elements
 
-    hypertoc --quiet --gen_anchors --bak "" --overwrite \
+    hypertoc --quiet --make_anchors --bak "" --overwrite \
     --toc_entry TITLE=1 --toc_end TITLE=/TITLE
     --toc_entry H2=2 --toc_entry H3=3 \
     --toc_end H2=/H2 --toc_end H3=/H3 \
-    --gen_toc --outfile index.html \
+    --make_toc --outfile index.html \
     mary.html fred.html george.html
 
 This creates anchors at the H2 and H3 elements, and creates a ToC file called
@@ -598,8 +560,8 @@ Given an options file called 'custom.opt' as follows:
 
 then the previous example can have shorter command lines as follows:
 
-    hypertoc --quiet --gen_anchors --bak "" --overwrite \
-    --argfile custom.opt --gen_toc --outfile index.html mary.html fred.html george.html
+    hypertoc --quiet --make_anchors --bak "" --overwrite \
+    --argfile custom.opt --make_toc --outfile index.html mary.html fred.html george.html
 
 =head1 NOTES
 
@@ -674,6 +636,12 @@ ToCs in the same file, one after the other.
 
 =item *
 
+Version 3.10 (and above) generates more verbose (SEO-friendly) anchors
+than prior versions. Thus anchors generated with earlier versions will
+not match version 3.10 anchors.
+
+=item *
+
 Version 3.00 (and above) of hypertoc behaves somewhat differently
 than Version 2.x of hypertoc.  It is now designed to do everything
 in one pass, and has dropped certain options: the --infile option
@@ -735,6 +703,7 @@ Tell me about them.
     Getopt::ArgvFile
     Pod::Usage
     HTML::LinkList
+    HTML::Entities
     HTML::GenToc
 
 =head1 SCRIPT CATEGORIES
@@ -770,7 +739,6 @@ options in C<~/.hypertocrc> and is overridden by command-line options.
 
 perl(1)
 htmltoc(1)
-HTML::LinkList
 HTML::GenToc
 Getopt::ArgvFile
 Getopt::Long
@@ -786,7 +754,7 @@ Contributions from Dan Dascalescu, <http://dandascalescu.com>
 =head1 COPYRIGHT
 
 Copyright (C) 1994-1997  Earl Hood, ehood AT medusa.acs.uci.edu
-Copyright (C) 2002-2007 Kathryn Andersen
+Copyright (C) 2002-2008 Kathryn Andersen
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
