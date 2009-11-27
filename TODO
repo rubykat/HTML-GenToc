@@ -1,9 +1,10 @@
 TODO list for HTML::GenToc
 ==========================
     HTML::GenToc
- 12. make toc_end optional, defaulting to / + toc_entry key
+ 13. make toc_end optional, defaulting to / + toc_entry key
     Added:23/09/04, 07:01  Priority: medium
 
- 13. figure out some way of *replacing* an inline ToC
+ 14. figure out some way of *replacing* an inline ToC
     Added:27/05/07, 14:31  Priority: medium
+
 
