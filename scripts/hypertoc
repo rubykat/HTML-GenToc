@@ -9,13 +9,15 @@ hypertoc - generate a table of contents for HTML documents
 
 hypertoc --help | --manpage | --man_help | --man
 
-hypertoc [--bak I<string> ] [ --debug ] [ --entrysep I<string> ] [ --footer I<file> ]
-[ --header I<file> ] [ --inline ] [ --make_anchors ] [ --make_toc ]
-[ --notoc_match I<string> ] [ --ol | --nool ] [ --ol_num_levels ] [ --outfile I<file> ]
-[ --overwrite ] [ --quiet ] [ --textonly ] [ --title I<string> ]
-{ --toc_after I<tag=suffix> } { --toc_before I<tag=prefix> }
-{ --toc_end I<tag=endtag> } { --toc_entry I<tag=level> }
-[ --toc_label I<string> ] [ --toc_only | --notoc_only ] [ --toc_tag I<string> ]
+hypertoc [--bak I<string> ] [ --debug ] [ --entrysep I<string> ]
+[ --footer I<file> ] [ --header I<file> ] [ --ignore_only_one ]
+[ --ignore_sole_first ] [ --inline ] [ --make_anchors ] [ --make_toc ]
+[ --notoc_match I<string> ] [ --ol | --nool ] [ --ol_num_levels ]
+[ --outfile I<file> ] [ --overwrite ] [ --quiet ] [ --textonly ]
+[ --title I<string> ] { --toc_after I<tag=suffix> }
+{ --toc_before I<tag=prefix> } { --toc_end I<tag=endtag> }
+{ --toc_entry I<tag=level> } [ --toc_label I<string> ]
+[ --toc_only | --notoc_only ] [ --toc_tag I<string> ]
 [ --toc_tag_replace ] [ --use_id ] [ --useorg ] file ...
 
 =head1 DESCRIPTION
@@ -106,6 +108,10 @@ File containing header text for table of contents.
 =item --help
 
 Print a short help message and exit.
+
+=item --ignore_only_one
+
+If there would be only one item in the ToC, don't make a ToC.
 
 =item --ignore_sole_first
 

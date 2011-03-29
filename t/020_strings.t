@@ -1,4 +1,4 @@
-use Test::More tests => 6;
+use Test::More tests => 7;
 use HTML::GenToc;
 
 # Insert your test code below
@@ -175,3 +175,26 @@ $ok_toc_str1='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN">
 ';
 
 is($out_str, $ok_toc_str1, "(6) generate_toc (ignore_sole_first) matches toc string");
+
+# ignore_only_one
+$html1 =<<EOT;
+<h1>Cool header</h1>
+<p>This is a paragraph.</p>
+EOT
+
+$out_str = $toc->generate_toc(
+    to_string=>1,
+    use_id=>1,
+    inline=>1,
+    ignore_only_one=>1,
+    toc_tag=>'/h1',
+    input=>$html1,
+);
+
+$ok_toc_str1 =<<EOT;
+<h1 id='Cool_header'>Cool header</h1>
+
+<p>This is a paragraph.</p>
+EOT
+
+is($out_str, $ok_toc_str1, "(7) generate_toc (ignore_only_one) matches string");

@@ -230,6 +230,12 @@ header => I<file_or_string>
 Either the filename of the file containing header text for ToC;
 or a string containing the header text.
 
+=item ignore_only_one
+
+ignore_only_one => 1
+
+If there would be only one item in the ToC, don't make a ToC.
+
 =item ignore_sole_first
 
 ignore_sole_first => 1
@@ -492,6 +498,7 @@ sub generate_toc ($%) {
 	ol=>$self->{ol},
 	ol_num_levels=>$self->{ol_num_levels},
 	entrysep=>$self->{entrysep},
+	ignore_only_one=>$self->{ignore_only_one},
 	@_
     );
 
@@ -590,51 +597,58 @@ sub generate_toc ($%) {
 	my %labels = ();
 	my @list_of_lists = ();
 	my $i = 0;
-	foreach my $fn (@filenames)
+	for (my $i = 0; $i < @filenames; $i++)
 	{
-	    push @list_of_lists, ($self->make_toc_list(%args,
+	    my @the_list = $self->make_toc_list(%args,
 		first_file=>$filenames[0],
 		labels=>\%labels,
-		filename=>$fn,
-		input=>$input[$i]));
-	    $i++;
-	}
-	#
-	# create the appropriate format
-	#
-	my %formats = ();
-	# check for non-list entries, flagged by negative levels
-	while (my ($key, $val) = each %{$args{toc_entry}})
-	{
-	    if ($val < 0)
+		filename=>$filenames[$i],
+		input=>$input[$i]);
+	    if (!($args{ignore_only_one}
+		and @the_list <= 1))
 	    {
-		$formats{abs($val) - 1} = {};
-		$formats{abs($val) - 1}->{tree_head} = '<ul><li>';
-		$formats{abs($val) - 1}->{tree_foot} = "\n</li></ul>\n";
-		$formats{abs($val) - 1}->{item_sep} = $args{entrysep};
-		$formats{abs($val) - 1}->{pre_item} = '';
-		$formats{abs($val) - 1}->{post_item} = '';
+		push @list_of_lists, @the_list;
 	    }
 	}
-	# check for OL
-	if ($args{ol})
+	if (@list_of_lists > 0)
 	{
-	    $formats{0} = {};
-	    $formats{0}->{tree_head} = '<ol>';
-	    $formats{0}->{tree_foot} = "\n</ol>";
-	    if ($args{ol_num_levels} > 0)
+	    #
+	    # create the appropriate format
+	    #
+	    my %formats = ();
+	    # check for non-list entries, flagged by negative levels
+	    while (my ($key, $val) = each %{$args{toc_entry}})
 	    {
-		$formats{$args{ol_num_levels}} = {};
-		$formats{$args{ol_num_levels}}->{tree_head} = '<ul>';
-		$formats{$args{ol_num_levels}}->{tree_foot} = "\n</ul>";
+		if ($val < 0)
+		{
+		    $formats{abs($val) - 1} = {};
+		    $formats{abs($val) - 1}->{tree_head} = '<ul><li>';
+		    $formats{abs($val) - 1}->{tree_foot} = "\n</li></ul>\n";
+		    $formats{abs($val) - 1}->{item_sep} = $args{entrysep};
+		    $formats{abs($val) - 1}->{pre_item} = '';
+		    $formats{abs($val) - 1}->{post_item} = '';
+		}
 	    }
+	    # check for OL
+	    if ($args{ol})
+	    {
+		$formats{0} = {};
+		$formats{0}->{tree_head} = '<ol>';
+		$formats{0}->{tree_foot} = "\n</ol>";
+		if ($args{ol_num_levels} > 0)
+		{
+		    $formats{$args{ol_num_levels}} = {};
+		    $formats{$args{ol_num_levels}}->{tree_head} = '<ul>';
+		    $formats{$args{ol_num_levels}}->{tree_foot} = "\n</ul>";
+		}
+	    }
+	    $toc_str = HTML::LinkList::link_tree(
+						 %args,
+						 link_tree=>\@list_of_lists,
+						 labels=>\%labels,
+						 formats=>\%formats,
+						);
 	}
-	$toc_str = HTML::LinkList::link_tree(
-	    %args,
-	    link_tree=>\@list_of_lists,
-	    labels=>\%labels,
-	    formats=>\%formats,
-	    );
     }
 
     #
@@ -962,6 +976,7 @@ sub make_toc_list ($%) {
 	toc_after=>$self->{toc_after},
 	textonly=>$self->{textonly},
 	ignore_sole_first=>$self->{ignore_sole_first},
+	ignore_only_one=>$self->{ignore_only_one},
 	@_
     );
     my $html_str = $args{input};
@@ -1149,6 +1164,11 @@ sub make_toc_list ($%) {
 	    $list_of_paths[$i]->{level}--;
 	}
     }
+    elsif ($args{ignore_only_one}
+	   and @list_of_paths == 1)
+    {
+	return ();
+    }
 
     my @list_of_lists = ();
     @list_of_lists = $self->build_lol(
@@ -1309,66 +1329,72 @@ sub output_toc ($%) {
     my $output = '';
     if ($args{make_toc})
     {
-	my @toc = ();
-	# put the header at the start of the ToC if there is one
-	if ($args{header}) {
-	    if (-f $args{header})
-	    {
-		open(HEADER, $args{header})
-		    || die "Error: unable to open ", $args{header}, ": $!\n";
-		push @toc, <HEADER>;
-		close (HEADER);
+	if ($args{toc})
+	{
+	    my @toc = ();
+	    # put the header at the start of the ToC if there is one
+	    if ($args{header}) {
+		if (-f $args{header})
+		{
+		    open(HEADER, $args{header})
+			|| die "Error: unable to open ", $args{header}, ": $!\n";
+		    push @toc, <HEADER>;
+		    close (HEADER);
+		}
+		else # not a file
+		{
+		    push @toc, $args{header};
+		}
 	    }
-	    else # not a file
-	    {
-		push @toc, $args{header};
+	    # if we are outputing a standalone page,
+	    # then make sure it can stand
+	    elsif (!$args{toc_only}
+		   && !$args{inline}) {
+
+		push @toc, qq|<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN">\n|,
+		     "<html>\n",
+		     "<head>\n";
+		push @toc, "<title>", $args{title}, "</title>\n"  if $args{title};
+		push @toc, "</head>\n",
+		     "<body>\n";
 	    }
-	}
-	# if we are outputing a standalone page,
-	# then make sure it can stand
-	elsif (!$args{toc_only}
-	       && !$args{inline}) {
 
-	    push @toc, qq|<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN">\n|,
-		 "<html>\n",
-		 "<head>\n";
-	    push @toc, "<title>", $args{title}, "</title>\n"  if $args{title};
-	    push @toc, "</head>\n",
-		 "<body>\n";
-	}
-
-	# start the ToC with the ToC label
-	if ($args{toclabel}) {
-	    push @toc, $args{toclabel};
-	}
-
-	# and the actual ToC
-	push @toc, "\n", $args{toc}, "\n";
-
-	# add the footer, if there is one
-	if ($args{footer}) {
-	    if (-f $args{footer})
-	    {
-		open(FOOTER, $args{footer})
-		    || die "Error: unable to open ", $args{footer}, ": $!\n";
-		push @toc, <FOOTER>;
-		close (FOOTER);
+	    # start the ToC with the ToC label
+	    if ($args{toclabel}) {
+		push @toc, $args{toclabel};
 	    }
-	    else
-	    {
-		push @toc, $args{footer};
+
+	    # and the actual ToC
+	    push @toc, "\n", $args{toc}, "\n";
+
+	    # add the footer, if there is one
+	    if ($args{footer}) {
+		if (-f $args{footer})
+		{
+		    open(FOOTER, $args{footer})
+			|| die "Error: unable to open ", $args{footer}, ": $!\n";
+		    push @toc, <FOOTER>;
+		    close (FOOTER);
+		}
+		else
+		{
+		    push @toc, $args{footer};
+		}
 	    }
+	    # if we are outputing a standalone page,
+	    # then make sure it can stand
+	    elsif (!$args{toc_only}
+		   && !$args{inline}) {
+
+		push @toc, "</body>\n", "</html>\n";
+	    }
+
+	    $output = join '', @toc;
 	}
-	# if we are outputing a standalone page,
-	# then make sure it can stand
-	elsif (!$args{toc_only}
-	       && !$args{inline}) {
-
-	    push @toc, "</body>\n", "</html>\n";
+	else
+	{
+	    $output = "\n";
 	}
-
-	$output = join '', @toc;
-
     }
     elsif ($args{make_anchors} && (!$args{overwrite} || $args{to_string}))
     {
