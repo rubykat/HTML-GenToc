@@ -79,7 +79,7 @@ my $good_output = <<'EOT';
 <li><a href="#The_big_Step_4">The big Step</a></li>
 <li><a href="#The_Big_Step_.236">The Big Step #6</a></li>
 <li><a href="#Calculation_.237:_7.2F5.3E3_or_.3C2.3F">Calculation #7: 7/5>3 or &lt;2?</a></li>
-<li><a href="#L.238:_start_with_a_number_.28hash.29_.5Bpound.5D_.7Bcomment.7D_sign">#8: start with a number (hash) [pound] {comment} sign</a></li>
+<li><a href="#start_with_a_number_.28hash.29_.5Bpound.5D_.7Bcomment.7D_sign">#8: start with a number (hash) [pound] {comment} sign</a></li>
 </ul>
 
   <h1><a name="The_Big_Step_1">The Big Step 1</a></h1>
@@ -102,7 +102,7 @@ my $good_output = <<'EOT';
   No spec as a reference for this, but the anchors work in Firefox 3 and IE 6.
   <h1><a name="Calculation_.237:_7.2F5.3E3_or_.3C2.3F">Calculation #7: 7/5>3 or &lt;2?</a></h1>
   Hash marks in fragments work, as well as '/' and '?' signs. &lt; and > are escaped.
-  <h1><a name="L.238:_start_with_a_number_.28hash.29_.5Bpound.5D_.7Bcomment.7D_sign">#8: start with a number (hash) [pound] {comment} sign</a></h1>
+  <h1><a name="start_with_a_number_.28hash.29_.5Bpound.5D_.7Bcomment.7D_sign">#8: start with a number (hash) [pound] {comment} sign</a></h1>
 </body>
 </html>
 EOT

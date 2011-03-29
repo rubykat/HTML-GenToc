@@ -16,7 +16,7 @@ if (-f 'test1_toc.html') {
 
 # now test the script
 my $command = "$^X -I lib scripts/hypertoc --quiet --gen_anchors --outfile test1_anch.wml tfiles/test1.wml";
-$result = system($command);
+my $result = system($command);
 ok($result == 0, 'hypertoc generated anchors from test1.wml');
 
 # compare the files
@@ -24,15 +24,15 @@ $result = compare('test1_anch.wml', 'tfiles/good_test1_anch.wml');
 ok($result, 'hypertoc: test1_anch.wml matches tfiles/good_test1_anch.wml exactly');
 
 $command = "$^X -I lib scripts/hypertoc --gen_toc --quiet --outfile test1_toc.html test1_anch.wml";
-$result = system($command);
-ok($result == 0, 'hypertoc generated toc from test1_anch.wml');
+my $result2 = system($command);
+ok($result2 == 0, 'hypertoc generated toc from test1_anch.wml');
 
 # compare the files
-$result = compare('test1_toc.html', 'tfiles/good_test1_toc.html');
-ok($result, 'hypertoc: test1_toc.html matches tfiles/good_test1_toc.html exactly');
+$result2 = compare('test1_toc.html', 'tfiles/good_test1_toc.html');
+ok($result2, 'hypertoc: test1_toc.html matches tfiles/good_test1_toc.html exactly');
 
 # clean up test1
-if ($result) {
+if ($result && $result2) {
     unlink('test1_anch.wml');
     unlink('test1_toc.html');
 }

@@ -674,19 +674,7 @@ sub make_anchor_name ($%) {
 	# characters then by the limitations of the values of 'id' and 'name'
 	# attributes: http://www.w3.org/TR/REC-html40/types.html#type-name
         # Eventually, the only punctuation allowed in id values is [_.:-]
-	# Unicode characters with code points > 0x7E (e.g. Chinese characters)
-	# are allowed (test "<h1 id="行政区域">header</h1>" at
-	# http://validator.w3.org/#validate_by_input+with_options), except for
-	# smart quotes (!), see
-	# http://www.w3.org/Search/Mail/Public/search?type-index=www-validator&index-type=t&keywords=[VE][122]+smart+quotes&search=Search+Mail+Archives
-	# However, that contradicts the HTML 4.01 spec: "Anchor names should be
-	# restricted to ASCII characters." -
-	# http://www.w3.org/TR/REC-html40/struct/links.html#h-12.2.1
-	# ...and the [A-Za-z] class of letters mentioned at
-	# http://www.w3.org/TR/REC-html40/types.html#type-name Finally, note
-	# that pod2html fails miserably to generate XHTML-compliant anchor
-	# links. See
-	# http://validator.w3.org/check?uri=http%3A%2F%2Fsearch.cpan.org%2Fdist%2FCatalyst-Runtime%2Flib%2FCatalyst%2FRequest.pm&charset=(detect+automatically)&doctype=XHTML+1.0+Transitional&group=0&user-agent=W3C_Validator%2F1.606
+
 	$name =~ s/\s/_/g;
 	# we need to replace [#&;] only when they are NOT part of an HTML
 	# entity. decode_entities saves us from crafting a nasty regexp
@@ -695,7 +683,11 @@ sub make_anchor_name ($%) {
 	# http://en.wikipedia.org/wiki/Hierarchies#Ethics.2C_behavioral_psychology.2C_philosophies_of_identity
 	$name =~ s/([^\w_.:-])/'.'.sprintf('%02X', ord($1))/eg;
 	# "ID and NAME tokens must begin with a letter ([A-Za-z])"
-        $name = 'L'.$name if $name =~ /\A\W/;
+	$name =~ s/^[^a-zA-Z]+//;
+    }
+    else
+    {
+	$name = 'id';
     }
     $name = 'id' if $name eq '';
 
