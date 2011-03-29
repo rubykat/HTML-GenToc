@@ -1,1 +1,3 @@
-.build
+HTML-GenToc*
+.build/
+.perlcritic_history
