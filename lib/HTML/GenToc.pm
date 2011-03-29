@@ -230,6 +230,15 @@ header => I<file_or_string>
 Either the filename of the file containing header text for ToC;
 or a string containing the header text.
 
+=item ignore_sole_first
+
+ignore_sole_first => 1
+
+If the first item in the ToC is of the highest level,
+AND it is the only one of that level, ignore it.
+This is useful in web-pages where there is only one H1 header
+but one doesn't know beforehand whether there will be only one.
+
 =item inline
 
 inline => 1
@@ -952,6 +961,7 @@ sub make_toc_list ($%) {
 	toc_before=>$self->{toc_before},
 	toc_after=>$self->{toc_after},
 	textonly=>$self->{textonly},
+	ignore_sole_first=>$self->{ignore_sole_first},
 	@_
     );
     my $html_str = $args{input};
@@ -961,6 +971,7 @@ sub make_toc_list ($%) {
     my $toc_str = "";
     my @toc = ();
     my @list_of_paths = ();
+    my %level_count = ();
 
     # parse the HTML
     my $hp = new HTML::SimpleParse();
@@ -1118,9 +1129,25 @@ sub make_toc_list ($%) {
 	    path=>$link,
 	    };
 	$labels->{$link} = $content;
+	$level_count{$level}++;
 
 	$name = 'NOTOC';
 	$prevnoli = $noli;
+    } # while tree
+
+    # If we want to ignore the first H1 if there's only one of them 
+    # if the first item is a level-0 item
+    # and there is only one of them
+    # then remove it and readjust levels
+    if ($args{ignore_sole_first}
+	and $level_count{"1"} == 1
+	and $list_of_paths[0]->{level} == 1)
+    {
+	shift @list_of_paths;
+	for (my $i = 0; $i < @list_of_paths; $i++)
+	{
+	    $list_of_paths[$i]->{level}--;
+	}
     }
 
     my @list_of_lists = ();

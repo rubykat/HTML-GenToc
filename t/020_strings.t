@@ -1,4 +1,4 @@
-use Test::More tests => 5;
+use Test::More tests => 6;
 use HTML::GenToc;
 
 # Insert your test code below
@@ -151,3 +151,27 @@ $ok_toc_str1='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN">
 
 is($out_str, $ok_toc_str1, "(5) generate_toc (id) matches toc string");
 
+# ignore sole first
+$out_str = $toc->generate_toc(
+    make_anchors=>0,
+    make_toc=>1,
+    to_string=>1,
+    filenames=>["fred.html"],
+    ignore_sole_first=>1,
+    input=>$html2,
+);
+
+$ok_toc_str1='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN">
+<html>
+<head>
+<title>Table of Contents</title>
+</head>
+<body>
+<h1>Table of Contents</h1>
+<ul><li><a href="fred.html#Getting_Cooler">Getting Cooler</a></li>
+</ul>
+</body>
+</html>
+';
+
+is($out_str, $ok_toc_str1, "(6) generate_toc (ignore_sole_first) matches toc string");

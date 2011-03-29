@@ -107,6 +107,13 @@ File containing header text for table of contents.
 
 Print a short help message and exit.
 
+=item --ignore_sole_first
+
+If the first item in the ToC is of the highest level,
+AND it is the only one of that level, ignore it.
+This is useful in web-pages where there is only one H1 header
+but one doesn't know beforehand whether there will be only one.
+
 =item --inline
 
 Put ToC in document at a given point.
@@ -813,6 +820,7 @@ sub process_args ($) {
 	'bak=s',
 	'entrysep=s',
 	'footer=s',
+	'ignore_sole_first!',
 	'inline!',
 	'header=s',
 	'notoc_match=s',
