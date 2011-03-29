@@ -5,15 +5,6 @@ use strict;
 
 HTML::GenToc - Generate a Table of Contents for HTML documents.
 
-=head1 VERSION
-
-This describes version B<3.10> of HTML::GenToc.
-
-=cut
-
-use vars qw($VERSION);
-$VERSION = '3.10';
-
 =head1 SYNOPSIS
 
   use HTML::GenToc;

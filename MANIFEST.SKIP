@@ -2,20 +2,14 @@
 \bRCS\b
 \bCVS\b
 ,v$
-^_darcs/
-^\.binaries$
-^\.boring$
-^\.darcs-temp-log.text
-^darcs_prebuild.pl$
-^mod_devaid.conf$
-^old_version.txt$
-^version.txt$
+^\.git
+^\.build
+^dist.ini$
+
 # archives
 .*\.tar\.gz$
 # the TODO file
 ^\.todo$
-# other files
-^hypertoc$
 
 # MakeMaker files
 ^Makefile$
