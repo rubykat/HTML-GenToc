@@ -698,13 +698,14 @@ sub make_anchor_name ($%) {
 	# attributes: http://www.w3.org/TR/REC-html40/types.html#type-name
         # Eventually, the only punctuation allowed in id values is [_.:-]
 
-	$name =~ s/\s/_/g;
 	# we need to replace [#&;] only when they are NOT part of an HTML
 	# entity. decode_entities saves us from crafting a nasty regexp
         decode_entities($name);
 	# MediaWiki also uses the period, see
 	# http://en.wikipedia.org/wiki/Hierarchies#Ethics.2C_behavioral_psychology.2C_philosophies_of_identity
-	$name =~ s/([^\w_.:-])/'.'.sprintf('%02X', ord($1))/eg;
+	$name =~ s/([^\s\w_.:-])/'.'.sprintf('%02X', ord($1))/eg;
+
+	$name =~ s/\s+/_/g;
 	# "ID and NAME tokens must begin with a letter ([A-Za-z])"
 	$name =~ s/^[^a-zA-Z]+//;
     }
