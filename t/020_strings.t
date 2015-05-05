@@ -21,6 +21,15 @@ $html2 ="<h1><a name=\"Cool_header\">Cool header</a></h1>
 <p>Another paragraph.</p>
 ";
 
+$html3 ="<h1><a name=\"Cool_header\">Cool header</a></h1>
+<p>This is a paragraph.</p>
+<h2><a name=\"Getting_Cooler\">Getting Cooler</a></h2>
+<p>Another paragraph.</p>
+<h2><a name=\"Coolest\">Coolest</a></h2>
+<p>Another paragraph.</p>
+";
+
+
 $out_str = $toc->generate_toc(
     make_anchors=>1,
     make_toc=>0,
@@ -158,7 +167,7 @@ $out_str = $toc->generate_toc(
     to_string=>1,
     filenames=>["fred.html"],
     ignore_sole_first=>1,
-    input=>$html2,
+    input=>$html3,
 );
 
 $ok_toc_str1='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN">
@@ -169,6 +178,7 @@ $ok_toc_str1='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML//EN">
 <body>
 <h1>Table of Contents</h1>
 <ul><li><a href="fred.html#Getting_Cooler">Getting Cooler</a></li>
+<li><a href="fred.html#Coolest">Coolest</a></li>
 </ul>
 </body>
 </html>
