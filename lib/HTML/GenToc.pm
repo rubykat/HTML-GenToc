@@ -1,4 +1,5 @@
 package HTML::GenToc;
+
 use strict;
 
 =head1 NAME
@@ -1896,7 +1897,7 @@ hypertoc(1)
 
 =head1 AUTHOR
 
-Kathryn Andersen     (RUBYKAT)	http://www.katspace.org/computers/tools/hypertoc/hypertoc/
+Kathryn Andersen     (RUBYKAT)	http://www.katspace.org/computers/tools/hypertoc/
 
 Based on htmltoc by Earl Hood       ehood AT medusa.acs.uci.edu
 
