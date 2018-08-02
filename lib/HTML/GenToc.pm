@@ -1896,7 +1896,7 @@ hypertoc(1)
 
 =head1 AUTHOR
 
-Kathryn Andersen     (RUBYKAT)	http://www.katspace.org/tools/hypertoc/
+Kathryn Andersen     (RUBYKAT)	http://www.katspace.org/computers/tools/hypertoc/hypertoc/
 
 Based on htmltoc by Earl Hood       ehood AT medusa.acs.uci.edu
 
