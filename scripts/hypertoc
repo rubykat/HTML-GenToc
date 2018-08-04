@@ -379,7 +379,7 @@ The following options try to index definition terms:
     --toc_end H2=/H2
 
     # Assumes document has a DD for each DT, otherwise ToC
-    # will get entries with alot of text.
+    # will get entries with a lot of text.
     --toc_entry DT=3
     --toc_end DT=DD
     --toc_before DT=<em>
