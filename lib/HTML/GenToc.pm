@@ -467,7 +467,7 @@ the method will return 1 rather than a string.
 
 use_id => 1
 
-Use id="I<name>" for anchors rather than <a name="I<name>"/> anchors.
+Use <a id="I<name>"/> for anchors rather than <a name="I<name>"/>.
 However if an anchor already exists for a Significant Element, this
 won't make an id for that particular element.
 
