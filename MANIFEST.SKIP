@@ -8,6 +8,7 @@
 
 # archives
 .*\.tar\.gz$
+^HTML-GenToc-*
 # the TODO file
 ^\.todo$
 
